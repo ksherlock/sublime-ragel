@@ -1,0 +1,137 @@
+%YAML 1.2
+---
+name: Ragel
+scope: embedding.ragel
+file_extensions:
+  - ragel
+  - rl
+
+contexts:
+  main: 
+    - match: ''
+      push: scope:source.c++
+      with_prototype:
+        - match: '%%{'
+          scope: punctuation.section.embedded.begin.ragel
+          push: ragel-block
+        - match: '%%'
+          push: ragel-line
+          scope: punctuation.section.embedded.begin.ragel
+        - include: host-variables
+
+  ragel-block:
+    - meta_scope: meta.embedded.block.ragel
+    - meta_content_scope: source.ragel
+
+    - match: '}%%'
+      scope: punctuation.section.embedded.end.ragel
+      pop: true
+    - include: ragel-keywords
+    - include: strings
+    - include: numbers
+
+      # built-in machines
+    - match: \b(any|ascii|extend|alpha|digit|alnum|lower|upper|xdigitcntrl|graphprint|punct|space|zlen|empty)\b
+      scope: support.constant.ragel
+    - match: '#'
+      push:
+        - meta_scope: comment.line
+        - match: \n
+          pop: true
+
+    - match: '{'
+      push: scope:source.c++
+      with_prototype:
+        - match: '}'
+          pop: true
+        - include: host-variables
+        - match: \b(fpc|fc|fcurs|ftargs|fentry)\b
+          scope: support.constant.ragel
+        - match: \b(fhold|fexec|fgoto|fnext|fcall|fret|fbreak|fncall|fnret|fnbreak)\b
+          scope: support.function.ragel
+
+
+  numbers:
+    - match: \d+
+      scope: constant.number
+    - match: 0x[A-Fa-f0-9]+
+      scope: constant.number.hex
+
+  strings:
+    - match: '"'
+      scope: punctuation.definition.string.begin
+      push:
+        - meta_scope: string.quoted.double
+        - match: '[^"\\\n]|\\(.|\n)'
+        - match: \n
+          scope: invalid.illegal
+          pop: true
+        - match: '"'
+          scope: punctuation.definition.string.end
+          pop: true
+
+    - match: \'
+      scope: punctuation.definition.string.begin
+      push:
+        - meta_scope: string.quoted.single
+        - match: '[^''\\\n]|\\(.|\n)'
+        - match: \n
+          scope: invalid.illegal
+          pop: true
+        - match: \'
+          scope: punctuation.definition.string.end
+          pop: true
+
+    - match: '/'
+      scope: punctuation.definition.string.begin
+      push:
+        - meta_scope: string.regexp
+        - match: '[^/\\\n]|\\(.|\n)'
+        - match: \n
+          scope: invalid.illegal
+          pop: true
+        - match: '/'
+          scope: punctuation.definition.string.end
+          pop: true
+
+    - match: \[
+      scope: punctuation.definition.string.begin
+      push:
+        - meta_scope: string.range
+        - match: '[^\]\\\n]|\\(.|\n)'
+        - match: \n
+          scope: invalid.illegal
+          pop: true
+        - match: \]
+          scope: punctuation.definition.string.end
+          pop: true
+
+
+
+  ragel-line:
+    - meta_scope: meta.embedded.block.ragel
+    - meta_content_scope: source.ragel
+    - match: \n
+      pop: true
+    - include: ragel-keywords
+    - include: strings
+
+
+  ragel-keywords:
+    - match: \b(include|import)\b
+      scope: keyword.control.import
+    - match: \b(alphtype|getkey|access|variable|prepush|postpop|write|action|machine|export|define|nfaprepush|nfapostpop)\b
+      scope: keyword.ragel
+    - match: \b(from|to|eof|lerr|err|when|inwhen|outwhen)\b
+      scope: keyword.ragel
+
+    - match: :(nfa|cond|condplus|condstar)\b
+      scope: keyword.ragel
+
+
+  write-component:
+    - match: \b(data|init|exec|start|first_final|error|noerror|nofinal|noprefix|nocs|noend|exports)\b
+
+  host-variables:
+    - match: \b(cs|p|pe|eof|data|stack|top|act|ts|te)\b
+      scope: support.variable.ragel

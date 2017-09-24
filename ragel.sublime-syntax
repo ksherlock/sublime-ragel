@@ -141,3 +141,5 @@ contexts:
   host-variables:
     - match: \b(cs|p|pe|eof|data|stack|top|act|ts|te)\b
       scope: support.variable.ragel
+    - match: \b([A-Za-z][A-Za-z0-9_]*)_(error|first_final|start)\b
+      scope: support.constant.ragel

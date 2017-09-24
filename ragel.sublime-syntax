@@ -35,6 +35,7 @@ contexts:
     - include: ragel-keywords
     - include: strings
     - include: numbers
+    - include: punctuation
 
       # built-in machines
     - match: \b(any|ascii|extend|alpha|digit|alnum|lower|upper|xdigitcntrl|graphprint|punct|space|zlen|empty)\b
@@ -55,6 +56,27 @@ contexts:
           scope: support.constant.ragel
         - match: \b(fhold|fexec|fgoto|fnext|fcall|fret|fbreak|fncall|fnret|fnbreak)\b
           scope: support.function.ragel
+
+
+  punctuation:
+    - match: ':>>|:>|<:|->|=>|\*\*|\|\*|\*\||:=|\|=|--'
+      scope: keyword.operator.ragel
+
+    - match: '[>$%<@][~*/!^]?'
+      scope: keyword.operator.ragel
+
+    - match: '<>[~*/!^]?'
+      scope: keyword.operator.ragel
+
+
+    - match: '[-:!?^*&+=]'
+      scope: keyword.operator.ragel
+
+    - match: \(
+      scope: punctuation.section.group.begin
+
+    - match: \)
+      scope: punctuation.section.group.end
 
 
   numbers:

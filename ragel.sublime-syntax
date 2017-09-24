@@ -26,6 +26,12 @@ contexts:
     - match: '}%%'
       scope: punctuation.section.embedded.end.ragel
       pop: true
+
+    - match: \b(machine)\s+([A-Za-z][A-Za-z0-9+]*)\s*;
+      captures:
+        1: keyword.ragel;
+        2: entity.name.machine.ragel
+
     - include: ragel-keywords
     - include: strings
     - include: numbers
